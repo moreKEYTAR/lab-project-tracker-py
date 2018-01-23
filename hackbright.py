@@ -20,16 +20,16 @@ def connect_to_db(app):
     db.init_app(app)
 
 
-def get_student_by_github(github):
+def get_student_by_github(github1):
     """Given a GitHub account name, print info about the matching student."""
 
     QUERY = """
         SELECT first_name, last_name, github
         FROM students
-        WHERE github = :github
+        WHERE github = :github2
         """
 
-    db_cursor = db.session.execute(QUERY, {'github': github})
+    db_cursor = db.session.execute(QUERY, {'github2': github1})
 
     row = db_cursor.fetchone()
 
@@ -63,7 +63,20 @@ def make_new_student(first_name, last_name, github):
 
 def get_project_by_title(title):
     """Given a project title, print information about the project."""
-    pass
+
+    QUERY = """
+        SELECT title, description, max_grade
+        FROM projects
+        WHERE title = :title
+        """
+
+    db_cursor = db.session.execute(QUERY, {'title': title})
+
+    row = db_cursor.fetchone()
+
+    print """Project title: {title}\nDescription: {description}\n
+          Max grade: {max_grade}""".format(title=row[0], description=row[1],
+                                           max_grade=row[2])
 
 
 def get_grade_by_github_title(github, title):
@@ -99,7 +112,8 @@ def handle_input():
             make_new_student(first_name, last_name, github)
 
         elif command == "get_project":
-            title = args[0]
+            title = args[0].title()
+            get_project_by_title(title)
 
         else:
             if command != "quit":
